@@ -49,11 +49,12 @@ services:
     depends_on:
       - app
       - omgwtfssl
+      - omgwtfssl2
     ports:
       # - 80:80
       - 443:443
     volumes:
-      - certs:/usr/local/apache2/conf/ncCerts:ro,z
+      - certs:/usr/local/apache2/conf/certs:ro,z
     networks:
       - proxy-tier
 
@@ -68,14 +69,23 @@ services:
   #     - db
   #     - redis
 
-  # collabora:
-  #   image: collabora/code:latest
-  #   container_name: collabora
-  #   restart: unless-stopped
-  #   environment:
-  #     - extra_params=--o:ssl.enable=false --o:storage.wopi.host[app]=true --o:user_interface.use_integration_theme=false # Use if have ssl. You should.
-  #   ports:
-  #     - 9980:9980
+  # https://cloud.thesysadminhub.com/s/FNKyP43y35HGDTJ?dir=/
+  # https://docs.nextcloud.com/server/28/admin_manual/office/example-docker.html#install-the-collabora-online-server
+  # TODO check all modules are enabled as of a2enmod proxy proxy_wstunnel proxy_http ssl 
+  collabora:
+    image: collabora/code:latest
+    hostname: collabora
+    container_name: collabora
+    restart: unless-stopped
+    environment:
+      - domain=collabora.local
+      - username=admin
+      - password=collaborapwd
+      - extra_params=--o:ssl.enable=false --o:ssl.termination=true
+    cap_add:
+      - MKNOD
+    ports:
+      - 9980:9980
 
   # self signed, outdated
   omgwtfssl:
@@ -89,6 +99,21 @@ services:
       - SSL_KEY=/certs/nextcloud.local.key
       - SSL_CSR=/certs/nextcloud.local.csr
       - SSL_CERT=/certs/nextcloud.local.crt
+    networks:
+      - proxy-tier
+  
+  # # self signed, outdated
+  omgwtfssl2:
+    image: paulczar/omgwtfssl
+    restart: "no"
+    volumes:
+      - certs:/certs
+    environment:
+      - SSL_SUBJECT=collabora.local
+      - CA_SUBJECT=my@example.com
+      - SSL_KEY=/certs/collabora.local.key
+      - SSL_CSR=/certs/collabora.local.csr
+      - SSL_CERT=/certs/collabora.local.crt
     networks:
       - proxy-tier
 

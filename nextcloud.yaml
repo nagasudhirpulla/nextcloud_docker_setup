@@ -1,0 +1,101 @@
+services:
+  # Note: PostgreSQL is an external service. You can find more information about the configuration here:
+  # https://hub.docker.com/_/postgres
+  db:
+    # Note: Check the recommend version here: https://docs.nextcloud.com/server/latest/admin_manual/installation/system_requirements.html#server
+    image: postgres:alpine
+    container_name: db
+    restart: always
+    volumes:
+      - db:/var/lib/postgresql/data:Z
+    env_file:
+      - db.env
+
+  # Note: Redis is an external service. You can find more information about the configuration here:
+  # https://hub.docker.com/_/redis
+  redis:
+    image: redis:alpine
+    container_name: redis
+    restart: always
+
+  app:
+    image: nextcloud:apache
+    container_name: app
+    # hostname: app
+    restart: always
+    # ports:
+    #   - 8080:80
+    volumes:
+      - nextcloud:/var/www/html:z
+      # NOTE: The `volumes` config of the `cron` and `app` containers must match
+    environment:
+      - POSTGRES_HOST=db
+      - REDIS_HOST=redis
+      - NEXTCLOUD_TRUSTED_DOMAINS=nextcloud.local
+    env_file:
+      - db.env
+    depends_on:
+      - db
+      - redis
+    networks:
+      - default
+      - proxy-tier
+
+  proxy:
+    build: ./proxy
+    restart: always
+    # container-name: proxy
+    hostname: proxy
+    depends_on:
+      - app
+      - omgwtfssl
+    ports:
+      # - 80:80
+      - 443:443
+    volumes:
+      - certs:/usr/local/apache2/conf/ncCerts:ro,z
+    networks:
+      - proxy-tier
+
+  # cron:
+  #   image: nextcloud:apache
+  #   restart: always
+  #   volumes:
+  #     - nextcloud:/var/www/html:z
+  #     # NOTE: The `volumes` config of the `cron` and `app` containers must match
+  #   entrypoint: /cron.sh
+  #   depends_on:
+  #     - db
+  #     - redis
+
+  # collabora:
+  #   image: collabora/code:latest
+  #   container_name: collabora
+  #   restart: unless-stopped
+  #   environment:
+  #     - extra_params=--o:ssl.enable=false --o:storage.wopi.host[app]=true --o:user_interface.use_integration_theme=false # Use if have ssl. You should.
+  #   ports:
+  #     - 9980:9980
+
+  # self signed, outdated
+  omgwtfssl:
+    image: paulczar/omgwtfssl
+    restart: "no"
+    volumes:
+      - certs:/certs
+    environment:
+      - SSL_SUBJECT=nextcloud.local
+      - CA_SUBJECT=my@example.com
+      - SSL_KEY=/certs/nextcloud.local.key
+      - SSL_CSR=/certs/nextcloud.local.csr
+      - SSL_CERT=/certs/nextcloud.local.crt
+    networks:
+      - proxy-tier
+
+volumes:
+  db:
+  nextcloud:
+  certs:
+
+networks:
+  proxy-tier:

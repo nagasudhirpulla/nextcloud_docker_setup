@@ -31,7 +31,7 @@ services:
     environment:
       - POSTGRES_HOST=db
       - REDIS_HOST=redis
-      - NEXTCLOUD_TRUSTED_DOMAINS=nextcloud.local
+      - NEXTCLOUD_TRUSTED_DOMAINS=nextcloud.local app 127.0.0.1 localhost
     env_file:
       - db.env
     depends_on:
@@ -74,8 +74,8 @@ services:
   # TODO check all modules are enabled as of a2enmod proxy proxy_wstunnel proxy_http ssl 
   collabora:
     image: collabora/code:latest
-    hostname: collabora
-    container_name: collabora
+    hostname: collabora.local
+    container_name: collabora.local
     restart: unless-stopped
     environment:
       - domain=collabora.local

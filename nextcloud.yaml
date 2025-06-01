@@ -19,7 +19,8 @@ services:
     restart: always
 
   app:
-    image: nextcloud:apache
+    # image: nextcloud:apache
+    build: ./nextcloud
     container_name: app
     # hostname: app
     restart: always
@@ -29,9 +30,11 @@ services:
       - nextcloud:/var/www/html:z
       # NOTE: The `volumes` config of the `cron` and `app` containers must match
     environment:
-      - POSTGRES_HOST=db
-      - REDIS_HOST=redis
-      - NEXTCLOUD_TRUSTED_DOMAINS='nextcloud.local'
+      POSTGRES_HOST: db
+      REDIS_HOST: redis
+      NEXTCLOUD_TRUSTED_DOMAINS: "nextcloud.local app"
+      NEXTCLOUD_ADMIN_USER: admin
+      NEXTCLOUD_ADMIN_PASSWORD: learning
     env_file:
       - db.env
     depends_on:
@@ -100,7 +103,7 @@ services:
       - SSL_CERT=/certs/nextcloud.local.crt
     networks:
       - proxy-tier
-  
+
   # self signed, outdated
   omgwtfssl2:
     image: paulczar/omgwtfssl
@@ -120,6 +123,7 @@ volumes:
   db:
   nextcloud:
   certs:
+
 
 networks:
   proxy-tier:

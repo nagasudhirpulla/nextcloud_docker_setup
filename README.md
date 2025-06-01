@@ -9,3 +9,6 @@ add trusted domains in nextcloud
 config file location in nextcloud docker container - `/var/www/html/config/config.php`
 
 https://help.nextcloud.com/t/howto-ubuntu-docker-nextcloud-talk-collabora/76430
+
+## TODO
+* use custom start.sh to run entry point and also additional scripts to set overwriteprotocol as https

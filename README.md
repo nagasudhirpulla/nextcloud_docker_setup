@@ -10,5 +10,5 @@ config file location in nextcloud docker container - `/var/www/html/config/confi
 
 https://help.nextcloud.com/t/howto-ubuntu-docker-nextcloud-talk-collabora/76430
 
-## TODO
-* use custom start.sh to run entry point and also additional scripts to set overwriteprotocol as https
+* command to run docker compose - `docker compose -f .\nextcloud.yaml up -d --build`
+* command to run container named app inside docker compose - `docker compose -f .\nextcloud.yaml up -d --build app`

@@ -29,6 +29,7 @@ services:
     volumes:
       - nextcloud:/var/www/html:z
       # NOTE: The `volumes` config of the `cron` and `app` containers must match
+      - ./nextcloud/appHooks/post-installation:/docker-entrypoint-hooks.d/post-installation
     environment:
       POSTGRES_HOST: db
       REDIS_HOST: redis

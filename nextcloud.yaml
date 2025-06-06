@@ -19,8 +19,7 @@ services:
     restart: always
 
   app:
-    # image: nextcloud:apache
-    build: ./nextcloud
+    image: nextcloud:apache
     container_name: app
     # hostname: app
     restart: always

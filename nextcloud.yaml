@@ -29,7 +29,7 @@ services:
       - nextcloud:/var/www/html:z
       # NOTE: The `volumes` config of the `cron` and `app` containers must match
       - ./nextcloud/appHooks/post-installation:/docker-entrypoint-hooks.d/post-installation
-      # - ./nextcloud/appHooks/before-starting:/docker-entrypoint-hooks.d/before-starting
+    # - ./nextcloud/appHooks/before-starting:/docker-entrypoint-hooks.d/before-starting
     environment:
       POSTGRES_HOST: db
       REDIS_HOST: redis
@@ -77,18 +77,23 @@ services:
   # https://docs.nextcloud.com/server/28/admin_manual/office/example-docker.html#install-the-collabora-online-server
   collabora:
     image: collabora/code:latest
-    hostname: collabora.local
-    container_name: collabora.local
+    hostname: collabora
+    container_name: collabora
     restart: unless-stopped
     environment:
-      - domain=collabora.local
-      - username=admin
-      - password=collaborapwd
-      - extra_params=--o:ssl.enable=false --o:ssl.termination=true
+      domain: collabora.local
+      dictionaries: en
+      username: admin
+      password: collaborapwd
+      aliasgroup1: https://nextcloud.local:443
+      extra_params: "--o:ssl.enable=false --o:ssl.termination=true"
     cap_add:
       - MKNOD
     ports:
-      - 9980:9980
+      - 127.0.0.1:9980:9980
+    networks:
+      - default
+      - proxy-tier
 
   # self signed, outdated
   omgwtfssl:

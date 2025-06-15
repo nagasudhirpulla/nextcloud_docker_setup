@@ -12,5 +12,5 @@ RUN set -ex; \
             -e 's/^#\(LoadModule .*mod_proxy_wstunnel.so\)/\1/' \
             -e 's/^#\(LoadModule .*mod_socache_shmcb.so\)/\1/' \
         /usr/local/apache2/conf/httpd.conf; \
+    echo "Include conf/collabora.conf" | tee -a /usr/local/apache2/conf/httpd.conf; \
     echo "Include conf/nextcloud.conf" | tee -a /usr/local/apache2/conf/httpd.conf;
-    # echo "Include conf/collabora.conf" | tee -a /usr/local/apache2/conf/httpd.conf;

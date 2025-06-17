@@ -24,3 +24,6 @@ php occ config:system:set trusted_domains 3 --value=192.168.0.3
 * Official docker nextcloud GitHub repo - https://github.com/nextcloud/docker
 * Run user defined scripts in nextcloud docker image using hook scripts - https://github.com/nextcloud/docker?tab=readme-ov-file#auto-configuration-via-hook-folders
 * nextcloud collabora integration guide - https://help.nextcloud.com/t/collabora-integration-guide/151879
+
+## TODO
+* replace hardcoded proxy ip in extra hosts of docker compose with environment variable like {proxy_ip}

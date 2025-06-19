@@ -100,6 +100,28 @@ services:
     networks:
       - default
       - proxy-tier
+  
+  coturn:
+    image: instrumentisto/coturn
+    hostname: coturn
+    container_name: coturn
+    restart: unless-stopped
+    extra_hosts:
+      "collabora.local": 172.19.0.4
+      "nextcloud.local": 172.19.0.4
+    ports:
+      - "3478:3478/tcp"
+      - "3478:3478/udp"
+    networks:
+      - default
+    command:
+      - -n
+      - --log-file=stdout
+      - --min-port=49160
+      - --max-port=49200
+      - --realm=nextcloud.local
+      - --use-auth-secret
+      - --static-auth-secret=passwd
 
   # self signed, outdated
   omgwtfssl:

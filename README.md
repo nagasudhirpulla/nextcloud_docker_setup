@@ -18,6 +18,14 @@ php occ config:system:set trusted_domains 2 --value=nextcloud.local
 php occ config:system:set trusted_domains 3 --value=192.168.0.3
 ```
 
+## .env file
+```bash
+REVPROXY_IPADDRESS=172.19.0.2
+NEXTCLOUD_FQDN=nextcloud.local
+COLLABORA_FQDN=collabora.local
+SIGNAL_FQDN=signal.local
+```
+
 ## References
 * Nextlcoud `occ` command docs - https://docs.nextcloud.com/server/stable/admin_manual/configuration_server/occ_command.html#using-the-occ-command
 * Nextcloud docker setup blog - https://help.nextcloud.com/t/howto-ubuntu-docker-nextcloud-talk-collabora/76430
@@ -26,4 +34,4 @@ php occ config:system:set trusted_domains 3 --value=192.168.0.3
 * nextcloud collabora integration guide - https://help.nextcloud.com/t/collabora-integration-guide/151879
 
 ## TODO
-* replace hardcoded proxy ip in extra hosts of docker compose with environment variable like {proxy_ip}
+* High-performance backend section not working in talk settings

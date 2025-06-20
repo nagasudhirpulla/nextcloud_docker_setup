@@ -33,12 +33,13 @@ services:
     environment:
       POSTGRES_HOST: db
       REDIS_HOST: redis
-      NEXTCLOUD_TRUSTED_DOMAINS: "nextcloud.local app 127.0.0.1"
+      NEXTCLOUD_TRUSTED_DOMAINS: "${NEXTCLOUD_FQDN} app 127.0.0.1"
       NEXTCLOUD_ADMIN_USER: admin
       NEXTCLOUD_ADMIN_PASSWORD: learning
     extra_hosts:
-      "collabora.local": 172.19.0.4
-      "nextcloud.local": 172.19.0.4
+      "${COLLABORA_FQDN}": ${REVPROXY_IPADDRESS}
+      "${NEXTCLOUD_FQDN}": ${REVPROXY_IPADDRESS}
+      "${SIGNAL_FQDN}": ${REVPROXY_IPADDRESS}
     env_file:
       - db.env
     depends_on:
@@ -84,15 +85,15 @@ services:
     container_name: collabora
     restart: unless-stopped
     environment:
-      domain: collabora.local
+      domain: ${COLLABORA_FQDN}
       dictionaries: en
       username: admin
       password: collaborapwd
-      aliasgroup1: https://nextcloud.local:443
+      aliasgroup1: https://${NEXTCLOUD_FQDN}:443
       extra_params: "--o:ssl.enable=false --o:ssl.termination=true"
     extra_hosts:
-      "collabora.local": 172.19.0.4
-      "nextcloud.local": 172.19.0.4
+      "${COLLABORA_FQDN}": ${REVPROXY_IPADDRESS}
+      "${NEXTCLOUD_FQDN}": ${REVPROXY_IPADDRESS}
     cap_add:
       - MKNOD
     ports:
@@ -101,27 +102,28 @@ services:
       - default
       - proxy-tier
   
-  coturn:
-    image: instrumentisto/coturn
-    hostname: coturn
-    container_name: coturn
-    restart: unless-stopped
-    extra_hosts:
-      "collabora.local": 172.19.0.4
-      "nextcloud.local": 172.19.0.4
+  nc-talk:
+    container_name: talk_hpb
+    image: ghcr.io/nextcloud-releases/aio-talk:latest
+    init: true
     ports:
-      - "3478:3478/tcp"
-      - "3478:3478/udp"
+      - 3478:3478/tcp
+      - 3478:3478/udp
+      - 8181:8081/tcp
+    environment:
+      - NC_DOMAIN=${NEXTCLOUD_FQDN}
+      - TALK_HOST=signal.local
+      - TURN_SECRET=secretpassword #this must be a long secretpasswordkey
+      - SIGNALING_SECRET=secretpassword #this must be a long secretpasswordkey
+      - TZ=Asia/India
+      - TALK_PORT=3478
+      - INTERNAL_SECRET=secretpassword #this must be a long secretpasswordkey
+    restart: unless-stopped
     networks:
       - default
-    command:
-      - -n
-      - --log-file=stdout
-      - --min-port=49160
-      - --max-port=49200
-      - --realm=nextcloud.local
-      - --use-auth-secret
-      - --static-auth-secret=passwd
+      - proxy-tier
+    extra_hosts:
+      "${NEXTCLOUD_FQDN}": ${REVPROXY_IPADDRESS}
 
   # self signed, outdated
   omgwtfssl:
@@ -130,11 +132,11 @@ services:
     volumes:
       - certs:/certs
     environment:
-      - SSL_SUBJECT=nextcloud.local
+      - SSL_SUBJECT=${NEXTCLOUD_FQDN}
       - CA_SUBJECT=nextcloud@example.com
-      - SSL_KEY=/certs/nextcloud.local.key
-      - SSL_CSR=/certs/nextcloud.local.csr
-      - SSL_CERT=/certs/nextcloud.local.crt
+      - SSL_KEY=/certs/${NEXTCLOUD_FQDN}.key
+      - SSL_CSR=/certs/${NEXTCLOUD_FQDN}.csr
+      - SSL_CERT=/certs/${NEXTCLOUD_FQDN}.crt
     networks:
       - proxy-tier
 
@@ -145,11 +147,25 @@ services:
     volumes:
       - certs:/certs
     environment:
-      - SSL_SUBJECT=collabora.local
+      - SSL_SUBJECT=${COLLABORA_FQDN}
       - CA_SUBJECT=collabora@example.com
-      - SSL_KEY=/certs/collabora.local.key
-      - SSL_CSR=/certs/collabora.local.csr
-      - SSL_CERT=/certs/collabora.local.crt
+      - SSL_KEY=/certs/${COLLABORA_FQDN}.key
+      - SSL_CSR=/certs/${COLLABORA_FQDN}.csr
+      - SSL_CERT=/certs/${COLLABORA_FQDN}.crt
+    networks:
+      - proxy-tier
+  
+  omgwtfssl3:
+    image: paulczar/omgwtfssl
+    restart: "no"
+    volumes:
+      - certs:/certs
+    environment:
+      - SSL_SUBJECT=signal.local
+      - CA_SUBJECT=signal@example.com
+      - SSL_KEY=/certs/signal.local.key
+      - SSL_CSR=/certs/signal.local.csr
+      - SSL_CERT=/certs/signal.local.crt
     networks:
       - proxy-tier
 

@@ -1,6 +1,7 @@
 FROM httpd
 COPY --chmod=664 nextcloud.conf /usr/local/apache2/conf/nextcloud.conf
 COPY --chmod=664 collabora.conf /usr/local/apache2/conf/collabora.conf
+COPY --chmod=664 signal.conf /usr/local/apache2/conf/signal.conf
 RUN set -ex; \
     sed -i \
             -e '/^Listen /d' \
@@ -12,5 +13,6 @@ RUN set -ex; \
             -e 's/^#\(LoadModule .*mod_proxy_wstunnel.so\)/\1/' \
             -e 's/^#\(LoadModule .*mod_socache_shmcb.so\)/\1/' \
         /usr/local/apache2/conf/httpd.conf; \
+    echo "Include conf/nextcloud.conf" | tee -a /usr/local/apache2/conf/httpd.conf; \
     echo "Include conf/collabora.conf" | tee -a /usr/local/apache2/conf/httpd.conf; \
-    echo "Include conf/nextcloud.conf" | tee -a /usr/local/apache2/conf/httpd.conf;
+    echo "Include conf/signal.conf" | tee -a /usr/local/apache2/conf/httpd.conf;

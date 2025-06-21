@@ -37,9 +37,9 @@ services:
       NEXTCLOUD_ADMIN_USER: ${NEXTCLOUD_UNAME}
       NEXTCLOUD_ADMIN_PASSWORD: ${NEXTCLOUD_PWD}
     extra_hosts:
-      "${COLLABORA_FQDN}": ${REVPROXY_IPADDRESS}
-      "${NEXTCLOUD_FQDN}": ${REVPROXY_IPADDRESS}
-      "${SIGNAL_FQDN}": ${REVPROXY_IPADDRESS}
+      - "${COLLABORA_FQDN}:${REVPROXY_IPADDRESS}"
+      - "${NEXTCLOUD_FQDN}:${REVPROXY_IPADDRESS}"
+      - "${SIGNAL_FQDN}:${REVPROXY_IPADDRESS}"
     env_file:
       - db.env
     depends_on:
@@ -90,8 +90,8 @@ services:
       aliasgroup1: https://${NEXTCLOUD_FQDN}:443
       extra_params: "--o:ssl.enable=false --o:ssl.termination=true"
     extra_hosts:
-      "${COLLABORA_FQDN}": ${REVPROXY_IPADDRESS}
-      "${NEXTCLOUD_FQDN}": ${REVPROXY_IPADDRESS}
+      - "${COLLABORA_FQDN}:${REVPROXY_IPADDRESS}"
+      - "${NEXTCLOUD_FQDN}:${REVPROXY_IPADDRESS}"
     cap_add:
       - MKNOD
     ports:
@@ -107,7 +107,7 @@ services:
     ports:
       - 3478:3478/tcp
       - 3478:3478/udp
-      - 8181:8081/tcp
+      - 8081:8081/tcp
     environment:
       - NC_DOMAIN=${NEXTCLOUD_FQDN}
       - TALK_HOST=${SIGNAL_FQDN}
@@ -115,13 +115,13 @@ services:
       - SIGNALING_SECRET=${SIGNALING_SECRET} #this must be a long secretpasswordkey
       - TZ=Asia/India
       - TALK_PORT=3478
-      - INTERNAL_SECRET=${secretpassword} #this must be a long secretpasswordkey
+      - INTERNAL_SECRET=${INTERNAL_SECRET} #this must be a long secretpasswordkey
     restart: unless-stopped
     networks:
       - default
       - proxy-tier
     extra_hosts:
-      ${NEXTCLOUD_FQDN}: ${REVPROXY_IPADDRESS}
+      - "${NEXTCLOUD_FQDN}:${REVPROXY_IPADDRESS}"
 
   # self signed, outdated
   omgwtfssl:

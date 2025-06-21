@@ -11,6 +11,42 @@ This repository is a docker compose based setup for nextcloud along with
 * config file location in nextcloud docker container - `/var/www/html/config/config.php`
 * access docker container as `www-data` user to run php occ commands - `docker exec -it -u www-data app bash`
 
+## Steps to run
+* Create `db.env` and `.env` files
+
+* Add the following dns entries in hosts file (since we are not using a real public domain)
+```bash
+127.0.0.1 nextcloud.local
+127.0.0.1 collabora.local
+127.0.0.1 signal.local
+```
+hosts file in windows is located at `C:\Windows\System32\drivers\etc\hosts`
+hosts file in debian is located at `/etc/hosts`
+
+* Run the whole docker compose with `docker compose -f 'nextcloud.yaml' up -d --build`
+
+    * Create self signed SSLs by running `omgwtfssl1`, `omgwtfssl2`, `omgwtfssl3` containers
+    ```bash
+    docker compose -f 'nextcloud.yaml' up -d --build 'omgwtfssl1'
+    docker compose -f 'nextcloud.yaml' up -d --build 'omgwtfssl2'
+    docker compose -f 'nextcloud.yaml' up -d --build 'omgwtfssl3'
+    ```
+
+    * Run `collabora` container (for nextcloud office online editor)
+    ```bash
+    docker compose -f 'nextcloud.yaml' up -d --build 'collabora'
+    ```
+
+    * Run `nc-talk` container (for nextcloud talk high performance backend)
+    ```bash
+    docker compose -f 'nextcloud.yaml' up -d --build 'nc-talk'
+    ```
+
+    * Run `proxy` container (reverse proxy for nextcloud)
+    ```bash
+    docker compose -f 'nextcloud.yaml' up -d --build 'proxy'
+    ```
+
 ## Tips
 * Add trusted domains in Nextcloud with occ command
 ```bash

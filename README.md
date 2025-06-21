@@ -84,4 +84,5 @@ POSTGRES_PASSWORD=learningsoftware
 * nextcloud collabora integration guide - https://help.nextcloud.com/t/collabora-integration-guide/151879
 
 ## TODO
-* High-performance backend section not working in talk settings
+* add nextcloud.local certificate to trusted certificates in etc/ssl/certs in nc-talk container
+* get nextcloud fqdn from .env file instead of hardcoding in the line `php occ config:app:get richdocuments wopi_url --value="https://collabora.local"`

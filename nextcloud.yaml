@@ -122,6 +122,7 @@ services:
       - proxy-tier
     extra_hosts:
       - "${NEXTCLOUD_FQDN}:${REVPROXY_IPADDRESS}"
+      - "${SIGNAL_FQDN}:${REVPROXY_IPADDRESS}"
 
   # self signed, outdated
   omgwtfssl:

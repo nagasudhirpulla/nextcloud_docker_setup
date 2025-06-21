@@ -22,8 +22,22 @@ php occ config:system:set trusted_domains 3 --value=192.168.0.3
 ```bash
 REVPROXY_IPADDRESS=172.19.0.2
 NEXTCLOUD_FQDN=nextcloud.local
+NEXTCLOUD_UNAME=admin
+NEXTCLOUD_PWD=learning
 COLLABORA_FQDN=collabora.local
+COLLABORA_UNAME=admin
+COLLABORA_PWD=collaborapwd
 SIGNAL_FQDN=signal.local
+TURN_SECRET=secretpassword
+SIGNALING_SECRET=secretpassword
+INTERNAL_SECRET=secretpassword
+```
+
+## db.env file
+```bash
+POSTGRES_DB=nextcloud
+POSTGRES_USER=nextcloud
+POSTGRES_PASSWORD=learningsoftware
 ```
 
 ## References

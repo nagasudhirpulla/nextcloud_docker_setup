@@ -29,6 +29,7 @@ services:
       - nextcloud:/var/www/html:z
       # NOTE: The `volumes` config of the `cron` and `app` containers must match
       - ./nextcloud/appHooks/post-installation:/docker-entrypoint-hooks.d/post-installation
+      - /nas:/nas
     # - ./nextcloud/appHooks/before-starting:/docker-entrypoint-hooks.d/before-starting
     environment:
       POSTGRES_HOST: db
@@ -36,6 +37,8 @@ services:
       NEXTCLOUD_TRUSTED_DOMAINS: "${NEXTCLOUD_FQDN} app 127.0.0.1"
       NEXTCLOUD_ADMIN_USER: ${NEXTCLOUD_UNAME}
       NEXTCLOUD_ADMIN_PASSWORD: ${NEXTCLOUD_PWD}
+      NEXTCLOUD_FQDN: ${NEXTCLOUD_FQDN}
+      COLLABORA_FQDN: ${COLLABORA_FQDN}
     extra_hosts:
       - "${COLLABORA_FQDN}:${REVPROXY_IPADDRESS}"
       - "${NEXTCLOUD_FQDN}:${REVPROXY_IPADDRESS}"
@@ -63,6 +66,10 @@ services:
       - certs:/usr/local/apache2/conf/certs:ro,z
     networks:
       - proxy-tier
+    environment:
+      NEXTCLOUD_FQDN: ${NEXTCLOUD_FQDN}
+      COLLABORA_FQDN: ${COLLABORA_FQDN}
+      SIGNAL_FQDN: ${SIGNAL_FQDN}
 
   # cron:
   #   image: nextcloud:apache
@@ -161,11 +168,11 @@ services:
     volumes:
       - certs:/certs
     environment:
-      - SSL_SUBJECT=signal.local
+      - SSL_SUBJECT=${SIGNAL_FQDN}
       - CA_SUBJECT=signal@example.com
-      - SSL_KEY=/certs/signal.local.key
-      - SSL_CSR=/certs/signal.local.csr
-      - SSL_CERT=/certs/signal.local.crt
+      - SSL_KEY=/certs/${SIGNAL_FQDN}.key
+      - SSL_CSR=/certs/${SIGNAL_FQDN}.csr
+      - SSL_CERT=/certs/${SIGNAL_FQDN}.crt
     networks:
       - proxy-tier
 
@@ -173,7 +180,6 @@ volumes:
   db:
   nextcloud:
   certs:
-
 
 networks:
   proxy-tier:

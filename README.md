@@ -49,7 +49,7 @@ hosts file in debian is located at `/etc/hosts`
 
 ## run cron nextcloud cron job
 * run `docker exec -u www-data nextcloud php /var/www/html/cron.php` every 5 mins so that cron.php is run the machine running the nextcloud docker container
-* Run `sudo crontab -e` and add the line `*/5 * * * * docker exec -u www-data nextcloud php /var/www/html/cron.php`
+* Run `sudo crontab -e -u www-data` and add the line `*/5 * * * * docker exec -u www-data nextcloud php /var/www/html/cron.php`
 
 ## Tips
 * Add trusted domains in Nextcloud with occ command

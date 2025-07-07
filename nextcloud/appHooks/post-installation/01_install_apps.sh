@@ -11,4 +11,4 @@ php occ app:install drawio
 # php -d memory_limit=512M occ app:install richdocumentscode
 
 # set collabora online server URL
-php occ config:app:get richdocuments wopi_url --value="https://collabora.local"
+php occ config:app:set richdocuments wopi_url --value="https://${COLLABORA_FQDN}"

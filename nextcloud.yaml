@@ -1,35 +1,34 @@
 services:
-  # Note: PostgreSQL is an external service. You can find more information about the configuration here:
-  # https://hub.docker.com/_/postgres
+  # Postgres DB for nextcloud. Reference: https://hub.docker.com/_/postgres
   db:
     # Note: Check the recommend version here: https://docs.nextcloud.com/server/latest/admin_manual/installation/system_requirements.html#server
     image: postgres:alpine
     container_name: db
     restart: always
     volumes:
-      - db:/var/lib/postgresql/data:Z
+      - db:/var/lib/postgresql:Z
     env_file:
       - db.env
 
-  # Note: Redis is an external service. You can find more information about the configuration here:
-  # https://hub.docker.com/_/redis
+  # Redis for nextcloud. Reference - https://hub.docker.com/_/redis
   redis:
     image: redis:alpine
     container_name: redis
     restart: always
 
+  # main nextcloud app container. Reference - https://hub.docker.com/_/nextcloud
   app:
     image: nextcloud:apache
     container_name: app
-    # hostname: app
+    hostname: app
     restart: always
-    # ports:
-    #   - 8080:80
+    ports:
+      - 8080:80
     volumes:
-      - nextcloud:/var/www/html:z
       # NOTE: The `volumes` config of the `cron` and `app` containers must match
+      - nextcloud:/var/www/html:z
       - ./nextcloud/appHooks/post-installation:/docker-entrypoint-hooks.d/post-installation
-      - /nas:/nas
+    # - /nas:/nas
     # - ./nextcloud/appHooks/before-starting:/docker-entrypoint-hooks.d/before-starting
     environment:
       POSTGRES_HOST: db
@@ -39,6 +38,9 @@ services:
       NEXTCLOUD_ADMIN_PASSWORD: ${NEXTCLOUD_PWD}
       NEXTCLOUD_FQDN: ${NEXTCLOUD_FQDN}
       COLLABORA_FQDN: ${COLLABORA_FQDN}
+      SIGNAL_FQDN: ${SIGNAL_FQDN}
+      SIGNALING_SECRET: ${SIGNALING_SECRET}
+      TURN_SECRET: ${TURN_SECRET}
     # extra_hosts:
     #   - "${COLLABORA_FQDN}:${REVPROXY_IPADDRESS}"
     #   - "${NEXTCLOUD_FQDN}:${REVPROXY_IPADDRESS}"
@@ -48,24 +50,25 @@ services:
     depends_on:
       - db
       - redis
+      - nc-talk
+      - proxy
     networks:
       - default
       - proxy-tier
 
+  # Apache reverse-proxy to expose nextcloud to the clients. Reference: https://hub.docker.com/_/httpd
   proxy:
     build: ./proxy
     restart: always
-    # container-name: proxy
+    container_name: proxy
     hostname: proxy
-    depends_on:
-      - app
     ports:
       # - 80:80
       - 443:443
     volumes:
       - certs:/usr/local/apache2/conf/certs:ro,z
     networks:
-      - proxy-tier:
+      proxy-tier:
         aliases:
           - ${NEXTCLOUD_FQDN}
           - ${COLLABORA_FQDN}
@@ -86,6 +89,7 @@ services:
   #     - db
   #     - redis
 
+  # Collabora online server for nextcloud to enable document processing. Reference: https://hub.docker.com/r/collabora/code
   # https://cloud.thesysadminhub.com/s/FNKyP43y35HGDTJ?dir=/
   # https://docs.nextcloud.com/server/28/admin_manual/office/example-docker.html#install-the-collabora-online-server
   collabora:
@@ -110,7 +114,8 @@ services:
     networks:
       - default
       - proxy-tier
-  
+
+  # nextcloud talk server for nextcloud to enable audio/video calls. Reference: https://hub.docker.com/r/nextcloud/aio-talk
   nc-talk:
     container_name: talk_hpb
     image: ghcr.io/nextcloud-releases/aio-talk:latest
@@ -124,7 +129,7 @@ services:
       - TALK_HOST=${SIGNAL_FQDN}
       - TURN_SECRET=${TURN_SECRET} #this must be a long secretpasswordkey
       - SIGNALING_SECRET=${SIGNALING_SECRET} #this must be a long secretpasswordkey
-      - TZ=Asia/India
+      - TZ=${TIME_ZONE}
       - TALK_PORT=3478
       - INTERNAL_SECRET=${INTERNAL_SECRET} #this must be a long secretpasswordkey
     restart: unless-stopped
@@ -135,9 +140,10 @@ services:
     #   - "${NEXTCLOUD_FQDN}:${REVPROXY_IPADDRESS}"
     #   - "${SIGNAL_FQDN}:${REVPROXY_IPADDRESS}"
 
-  # self signed, outdated
+  # self signed SSL certificate for nextcloud, outdated
   omgwtfssl:
     image: paulczar/omgwtfssl
+    container_name: omgwtfssl
     restart: "no"
     volumes:
       - certs:/certs
@@ -150,9 +156,10 @@ services:
     networks:
       - proxy-tier
 
-  # self signed, outdated
+  # self signed SSL certificate for collabora server, outdated
   omgwtfssl2:
     image: paulczar/omgwtfssl
+    container_name: omgwtfssl2
     restart: "no"
     volumes:
       - certs:/certs
@@ -164,10 +171,11 @@ services:
       - SSL_CERT=/certs/${COLLABORA_FQDN}.crt
     networks:
       - proxy-tier
-  
-  # self signed, outdated
+
+  # self signed SSL certificate for nextcloud talk server, outdated
   omgwtfssl3:
     image: paulczar/omgwtfssl
+    container_name: omgwtfssl3
     restart: "no"
     volumes:
       - certs:/certs

@@ -25,26 +25,31 @@ hosts file in debian is located at `/etc/hosts`
 
 * Run the whole docker compose with `docker compose -f 'nextcloud.yaml' up -d --build`
 
-    * Create self signed SSLs by running `omgwtfssl1`, `omgwtfssl2`, `omgwtfssl3` containers
+    * Create self signed SSLs by running `omgwtfssl`, `omgwtfssl2`, `omgwtfssl3` containers
     ```bash
-    docker compose -f 'nextcloud.yaml' up -d --build 'omgwtfssl1'
-    docker compose -f 'nextcloud.yaml' up -d --build 'omgwtfssl2'
-    docker compose -f 'nextcloud.yaml' up -d --build 'omgwtfssl3'
+    docker compose -f nextcloud.yaml up -d --build omgwtfssl
+    docker compose -f nextcloud.yaml up -d --build omgwtfssl2
+    docker compose -f nextcloud.yaml up -d --build omgwtfssl3
     ```
 
     * Run `collabora` container (for nextcloud office online editor)
     ```bash
-    docker compose -f 'nextcloud.yaml' up -d --build 'collabora'
+    docker compose -f nextcloud.yaml up -d --build collabora
     ```
 
     * Run `nc-talk` container (for nextcloud talk high performance backend)
     ```bash
-    docker compose -f 'nextcloud.yaml' up -d --build 'nc-talk'
+    docker compose -f nextcloud.yaml up -d --build nc-talk
     ```
 
     * Run `proxy` container (reverse proxy for nextcloud)
     ```bash
-    docker compose -f 'nextcloud.yaml' up -d --build 'proxy'
+    docker compose -f nextcloud.yaml up -d --build proxy
+    ```
+
+    * Run `app` container (nextcloud)
+    ```bash
+    docker compose -f nextcloud.yaml up -d --build app
     ```
 
 ## run cron nextcloud cron job

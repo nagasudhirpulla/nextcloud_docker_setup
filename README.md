@@ -86,6 +86,7 @@ POSTGRES_PASSWORD=learningsoftware
 * Official docker nextcloud GitHub repo - https://github.com/nextcloud/docker
 * Run user defined scripts in nextcloud docker image using hook scripts - https://github.com/nextcloud/docker?tab=readme-ov-file#auto-configuration-via-hook-folders
 * nextcloud collabora integration guide - https://help.nextcloud.com/t/collabora-integration-guide/151879
+* nextcloud talk occ commands - https://nextcloud-talk.readthedocs.io/en/latest/occ/
 
 ## TODO
 * add nextcloud.local certificate to trusted certificates in etc/ssl/certs in nc-talk container

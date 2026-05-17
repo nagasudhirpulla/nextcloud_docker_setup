@@ -13,9 +13,4 @@ php occ config:system:set overwritehost --value="$NEXTCLOUD_FQDN"
 # 4. Ensure background cron jobs generate correct URLs in emails/notifications
 php occ config:system:set overwrite.cli.url --value="https://$NEXTCLOUD_FQDN"
 
-# 5. Tell Nextcloud to read client IPs from the Apache proxy header safely
-php occ config:system:set forwarded_for_headers --value="HTTP_X_FORWARDED_FOR"
-
-# php occ config:system:set trusted_proxies 1 --value=127.0.0.1
-
 # # config.php location is /var/www/html/config/config.php please check here if the values are set correctly 

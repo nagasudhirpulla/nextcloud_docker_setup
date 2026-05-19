@@ -130,6 +130,7 @@ services:
       - TZ=${TIME_ZONE}
       - TALK_PORT=3478
       - INTERNAL_SECRET=${INTERNAL_SECRET} #this must be a long secretpasswordkey
+      - SKIP_TLS_VERIFY=true
     restart: unless-stopped
     networks:
       - default

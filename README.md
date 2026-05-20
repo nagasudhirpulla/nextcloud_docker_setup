@@ -65,7 +65,6 @@ php occ config:system:set trusted_domains 3 --value=192.168.0.3
 
 ## .env file
 ```bash
-REVPROXY_IPADDRESS=172.19.0.2
 NEXTCLOUD_FQDN=nextcloud.local
 NEXTCLOUD_UNAME=admin
 NEXTCLOUD_PWD=learning
@@ -76,6 +75,7 @@ SIGNAL_FQDN=signal.local
 TURN_SECRET=secretpassword
 SIGNALING_SECRET=secretpassword
 INTERNAL_SECRET=secretpassword
+SKIP_CERT_VERIFY=true
 ```
 
 ## db.env file
@@ -92,7 +92,3 @@ POSTGRES_PASSWORD=learningsoftware
 * Run user defined scripts in nextcloud docker image using hook scripts - https://github.com/nextcloud/docker?tab=readme-ov-file#auto-configuration-via-hook-folders
 * nextcloud collabora integration guide - https://help.nextcloud.com/t/collabora-integration-guide/151879
 * nextcloud talk occ commands - https://nextcloud-talk.readthedocs.io/en/latest/occ/
-
-## TODO
-* add nextcloud.local certificate to trusted certificates in etc/ssl/certs in nc-talk container
-* get nextcloud fqdn from .env file instead of hardcoding in the line `php occ config:app:get richdocuments wopi_url --value="https://collabora.local"`

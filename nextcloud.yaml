@@ -130,7 +130,7 @@ services:
       - TZ=${TIME_ZONE}
       - TALK_PORT=3478
       - INTERNAL_SECRET=${INTERNAL_SECRET} #this must be a long secretpasswordkey
-      - SKIP_TLS_VERIFY=true
+      - SKIP_CERT_VERIFY=${SKIP_CERT_VERIFY} # set to "true" to skip cert verification for self-signed certs, otherwise set to "false"
     restart: unless-stopped
     networks:
       - default

@@ -16,7 +16,7 @@ php occ app:install spreed
 # install nextcloud drawio app
 php occ app:install drawio
 
-# # install nextcloud built in code server
+# # install nextcloud built in code server instead of a separate collabora online server
 # php -d memory_limit=512M occ app:install richdocumentscode
 
 # occ commands for nextcloud talk docker image - https://nextcloud-talk.readthedocs.io/en/latest/occ/#talksignalingadd

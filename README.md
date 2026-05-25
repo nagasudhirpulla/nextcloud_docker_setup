@@ -5,6 +5,8 @@ This repository is a docker compose based setup for nextcloud along with
 * Nextcloud talk 
 * Apache reverse proxy
 
+![architecture.svg](./img/architecture.svg)
+
 ## Docker instructions
 * command to run docker compose - `docker compose -f .\nextcloud.yaml up -d --build`
 * command to run container named app inside docker compose - `docker compose -f .\nextcloud.yaml up -d --build app`
@@ -51,6 +53,17 @@ hosts file in debian is located at `/etc/hosts`
     ```bash
     docker compose -f nextcloud.yaml up -d --build app
     ```
+* If the post-installation scripts could not run correctly due to some reason, they can be run again using the following scripts
+```batch
+docker exec -u www-data -i app sh < .\nextcloud\appHooks\post-installation\00_indicate_rev_proxy_https.sh
+docker exec -u www-data -i app sh < .\nextcloud\appHooks\post-installation\01_install_apps.sh
+```
+To run script from Linux based workstations, use the following commands instead
+```bash
+docker exec -u www-data -i app sh < ./nextcloud/appHooks/post-installation/00_indicate_rev_proxy_https.sh
+docker exec -u www-data -i app sh < ./nextcloud/appHooks/post-installation/01_install_apps.sh
+```
+
 
 ## run cron nextcloud cron job
 * run `docker exec -u www-data app php /var/www/html/cron.php` every 5 mins so that cron.php is run the machine running the nextcloud docker container

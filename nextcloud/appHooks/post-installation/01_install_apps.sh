@@ -19,7 +19,8 @@ php occ app:install drawio
 php occ config:app:set richdocuments wopi_url --value="https://$COLLABORA_FQDN"
 
 # Disable SSL certificate verification (use only for testing!)
-php occ config:app:set richdocuments disable_certificate_verification --value="yes"
+[ "$SKIP_CERT_VERIFY" = "true" ] && export disable_cert_verification="yes" || export disable_cert_verification="no"
+php occ config:app:set richdocuments disable_certificate_verification --value="$disable_cert_verification"
 
 # occ commands for nextcloud talk server configuration in nextcloud - https://nextcloud-talk.readthedocs.io/en/latest/occ/#talksignalingadd
 # add high performance backend (signaling server) for nextcloud talk

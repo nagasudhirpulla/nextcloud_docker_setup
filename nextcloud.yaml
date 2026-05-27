@@ -40,6 +40,7 @@ services:
       COLLABORA_FQDN: ${COLLABORA_FQDN}
       SIGNAL_FQDN: ${SIGNAL_FQDN}
       SIGNALING_SECRET: ${SIGNALING_SECRET}
+      SKIP_CERT_VERIFY: ${SKIP_CERT_VERIFY} # set to "true" to skip cert verification for self-signed certs, otherwise set to "false"
       TURN_SECRET: ${TURN_SECRET}
     # extra_hosts:
     #   - "${COLLABORA_FQDN}:${REVPROXY_IPADDRESS}"
@@ -75,6 +76,7 @@ services:
       NEXTCLOUD_FQDN: ${NEXTCLOUD_FQDN}
       COLLABORA_FQDN: ${COLLABORA_FQDN}
       SIGNAL_FQDN: ${SIGNAL_FQDN}
+      SKIP_CERT_VERIFY: ${SKIP_CERT_VERIFY}
 
   # cron:
   #   image: nextcloud:apache
@@ -102,6 +104,7 @@ services:
       password: ${COLLABORA_PWD}
       aliasgroup1: https://${NEXTCLOUD_FQDN}:443
       extra_params: "--o:ssl.enable=false --o:ssl.termination=true"
+      SKIP_CERT_VERIFY: ${SKIP_CERT_VERIFY}
     # extra_hosts:
     #   - "${COLLABORA_FQDN}:${REVPROXY_IPADDRESS}"
     #   - "${NEXTCLOUD_FQDN}:${REVPROXY_IPADDRESS}"

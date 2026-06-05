@@ -40,7 +40,7 @@ services:
       COLLABORA_FQDN: ${COLLABORA_FQDN}
       SIGNAL_FQDN: ${SIGNAL_FQDN}
       SIGNALING_SECRET: ${SIGNALING_SECRET}
-      SKIP_CERT_VERIFY: ${SKIP_CERT_VERIFY} # set to "true" to skip cert verification for self-signed certs, otherwise set to "false"
+      SKIP_CERT_VERIFY: ${SKIP_CERT_VERIFY} # true for local self-signed certs; false for CA-issued valid SSL certificates
       TURN_SECRET: ${TURN_SECRET}
     # extra_hosts:
     #   - "${COLLABORA_FQDN}:${REVPROXY_IPADDRESS}"
@@ -76,6 +76,7 @@ services:
       NEXTCLOUD_FQDN: ${NEXTCLOUD_FQDN}
       COLLABORA_FQDN: ${COLLABORA_FQDN}
       SIGNAL_FQDN: ${SIGNAL_FQDN}
+      # keep this false when moving to CA-issued valid SSL certificates
       SKIP_CERT_VERIFY: ${SKIP_CERT_VERIFY}
 
   # cron:
@@ -104,6 +105,7 @@ services:
       password: ${COLLABORA_PWD}
       aliasgroup1: https://${NEXTCLOUD_FQDN}:443
       extra_params: "--o:ssl.enable=false --o:ssl.termination=true"
+      # keep this false when moving to CA-issued valid SSL certificates
       SKIP_CERT_VERIFY: ${SKIP_CERT_VERIFY}
     # extra_hosts:
     #   - "${COLLABORA_FQDN}:${REVPROXY_IPADDRESS}"
@@ -133,7 +135,7 @@ services:
       - TZ=${TIME_ZONE}
       - TALK_PORT=3478
       - INTERNAL_SECRET=${INTERNAL_SECRET} #this must be a long secretpasswordkey
-      - SKIP_CERT_VERIFY=${SKIP_CERT_VERIFY} # set to "true" to skip cert verification for self-signed certs, otherwise set to "false"
+      - SKIP_CERT_VERIFY=${SKIP_CERT_VERIFY} # true for local self-signed certs; false for CA-issued valid SSL certificates
     restart: unless-stopped
     networks:
       - default
@@ -143,6 +145,7 @@ services:
     #   - "${SIGNAL_FQDN}:${REVPROXY_IPADDRESS}"
 
   # self signed SSL certificate for nextcloud, outdated
+  # For a CA-issued valid SSL certificate, remove or ignore this service and mount your trusted cert/key/chain into the proxy container instead.
   omgwtfssl:
     image: paulczar/omgwtfssl
     container_name: omgwtfssl
@@ -159,6 +162,7 @@ services:
       - proxy-tier
 
   # self signed SSL certificate for collabora server, outdated
+  # For a CA-issued valid SSL certificate, remove or ignore this service and provide trusted certificates to the proxy container.
   omgwtfssl2:
     image: paulczar/omgwtfssl
     container_name: omgwtfssl2
@@ -175,6 +179,7 @@ services:
       - proxy-tier
 
   # self signed SSL certificate for nextcloud talk server, outdated
+  # For a CA-issued valid SSL certificate, remove or ignore this service and provide trusted certificates to the proxy container.
   omgwtfssl3:
     image: paulczar/omgwtfssl
     container_name: omgwtfssl3

@@ -33,6 +33,8 @@ hosts file in debian is located at `/etc/hosts`
     docker compose -f nextcloud.yaml up -d --build omgwtfssl2
     docker compose -f nextcloud.yaml up -d --build omgwtfssl3
     ```
+    * For a CA-issued certificate, skip the self-signed generators and instead mount your valid cert/key/chain into the `proxy` container's `certs` volume.
+      Also set `SKIP_CERT_VERIFY=false` in `.env` so services require trusted certificate verification.
 
     * Run `collabora` container (for nextcloud office online editor)
     ```bash
@@ -88,6 +90,7 @@ SIGNAL_FQDN=signal.local
 TURN_SECRET=secretpassword
 SIGNALING_SECRET=secretpassword
 INTERNAL_SECRET=secretpassword
+# set to "true" for local self-signed certificates, or "false" when using a CA-issued valid SSL certificate
 SKIP_CERT_VERIFY=true
 ```
 

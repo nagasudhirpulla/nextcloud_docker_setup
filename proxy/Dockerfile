@@ -2,6 +2,8 @@ FROM httpd
 COPY --chmod=664 nextcloud.conf /usr/local/apache2/conf/nextcloud.conf
 COPY --chmod=664 collabora.conf /usr/local/apache2/conf/collabora.conf
 COPY --chmod=664 signal.conf /usr/local/apache2/conf/signal.conf
+COPY --chmod=664 self_signed/true.conf /usr/local/apache2/conf/extra/self_signed/true.conf
+COPY --chmod=664 self_signed/false.conf /usr/local/apache2/conf/extra/self_signed/false.conf
 RUN set -ex; \
     sed -i \
             -e '/^Listen /d' \

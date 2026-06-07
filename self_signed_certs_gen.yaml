@@ -13,6 +13,10 @@ services:
       - SSL_KEY=/certs/${NEXTCLOUD_FQDN}.key
       - SSL_CSR=/certs/${NEXTCLOUD_FQDN}.csr
       - SSL_CERT=/certs/${NEXTCLOUD_FQDN}.crt
+    # Entrypoint override to generate the bundle file automatically
+    entrypoint: >
+      /bin/sh -c "/usr/local/bin/generate-certs && 
+      cat /certs/${NEXTCLOUD_FQDN}.crt /certs/ca.pem > /certs/${NEXTCLOUD_FQDN}-chain.crt"
 
   # self signed SSL certificate for collabora server, outdated
   # For a CA-issued valid SSL certificate, remove or ignore this service and provide trusted certificates to the proxy container.
@@ -28,6 +32,10 @@ services:
       - SSL_KEY=/certs/${COLLABORA_FQDN}.key
       - SSL_CSR=/certs/${COLLABORA_FQDN}.csr
       - SSL_CERT=/certs/${COLLABORA_FQDN}.crt
+    # Entrypoint override to generate the bundle file automatically
+    entrypoint: >
+      /bin/sh -c "/usr/local/bin/generate-certs && 
+      cat /certs/${COLLABORA_FQDN}.crt /certs/ca.pem > /certs/${COLLABORA_FQDN}-chain.crt"
 
   # self signed SSL certificate for nextcloud talk server, outdated
   # For a CA-issued valid SSL certificate, remove or ignore this service and provide trusted certificates to the proxy container.
@@ -43,3 +51,7 @@ services:
       - SSL_KEY=/certs/${SIGNAL_FQDN}.key
       - SSL_CSR=/certs/${SIGNAL_FQDN}.csr
       - SSL_CERT=/certs/${SIGNAL_FQDN}.crt
+    # Entrypoint override to generate the bundle file automatically
+    entrypoint: >
+      /bin/sh -c "/usr/local/bin/generate-certs && 
+      cat /certs/${SIGNAL_FQDN}.crt /certs/ca.pem > /certs/${SIGNAL_FQDN}-chain.crt"

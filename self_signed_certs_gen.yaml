@@ -1,0 +1,45 @@
+services:
+  # self signed SSL certificate for nextcloud, outdated
+  # For a CA-issued valid SSL certificate, remove or ignore this service and mount your trusted cert/key/chain into the proxy container instead.
+  omgwtfssl:
+    image: paulczar/omgwtfssl
+    container_name: omgwtfssl
+    restart: "no"
+    volumes:
+      - ./certs:/certs
+    environment:
+      - SSL_SUBJECT=${NEXTCLOUD_FQDN}
+      - CA_SUBJECT=nextcloud@example.com
+      - SSL_KEY=/certs/${NEXTCLOUD_FQDN}.key
+      - SSL_CSR=/certs/${NEXTCLOUD_FQDN}.csr
+      - SSL_CERT=/certs/${NEXTCLOUD_FQDN}.crt
+
+  # self signed SSL certificate for collabora server, outdated
+  # For a CA-issued valid SSL certificate, remove or ignore this service and provide trusted certificates to the proxy container.
+  omgwtfssl2:
+    image: paulczar/omgwtfssl
+    container_name: omgwtfssl2
+    restart: "no"
+    volumes:
+      - ./certs:/certs
+    environment:
+      - SSL_SUBJECT=${COLLABORA_FQDN}
+      - CA_SUBJECT=collabora@example.com
+      - SSL_KEY=/certs/${COLLABORA_FQDN}.key
+      - SSL_CSR=/certs/${COLLABORA_FQDN}.csr
+      - SSL_CERT=/certs/${COLLABORA_FQDN}.crt
+
+  # self signed SSL certificate for nextcloud talk server, outdated
+  # For a CA-issued valid SSL certificate, remove or ignore this service and provide trusted certificates to the proxy container.
+  omgwtfssl3:
+    image: paulczar/omgwtfssl
+    container_name: omgwtfssl3
+    restart: "no"
+    volumes:
+      - ./certs:/certs
+    environment:
+      - SSL_SUBJECT=${SIGNAL_FQDN}
+      - CA_SUBJECT=signal@example.com
+      - SSL_KEY=/certs/${SIGNAL_FQDN}.key
+      - SSL_CSR=/certs/${SIGNAL_FQDN}.csr
+      - SSL_CERT=/certs/${SIGNAL_FQDN}.crt

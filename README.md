@@ -29,9 +29,9 @@ hosts file in debian is located at `/etc/hosts`
 
     * Create self signed SSLs by running `omgwtfssl`, `omgwtfssl2`, `omgwtfssl3` containers
     ```bash
-    docker compose -f nextcloud.yaml up -d --build omgwtfssl
-    docker compose -f nextcloud.yaml up -d --build omgwtfssl2
-    docker compose -f nextcloud.yaml up -d --build omgwtfssl3
+    docker compose -f self_signed_certs_gen.yaml up -d --build omgwtfssl
+    docker compose -f self_signed_certs_gen.yaml up -d --build omgwtfssl2
+    docker compose -f self_signed_certs_gen.yaml up -d --build omgwtfssl3
     ```
     * For a CA-issued certificate, skip the self-signed generators and instead mount your valid cert/key/chain into the `proxy` container's `certs` volume.
       Also set `SKIP_CERT_VERIFY=false` in `.env` so services require trusted certificate verification.

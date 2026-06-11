@@ -33,7 +33,7 @@ hosts file in debian is located at `/etc/hosts`
     docker compose -f self_signed_certs_gen.yaml up -d --build omgwtfssl2
     docker compose -f self_signed_certs_gen.yaml up -d --build omgwtfssl3
     ```
-    * For a CA-issued certificate, skip the self-signed generators and instead mount your valid cert/key/chain into the `proxy` container's `certs` volume.
+    * For a CA-issued certificate, skip the self-signed generators and instead save the valid cert/key/chain into the `certs` folder.
       Also set `SKIP_CERT_VERIFY=false` in `.env` so services require trusted certificate verification.
 
     * Run `collabora` container (for nextcloud office online editor)
@@ -56,10 +56,12 @@ hosts file in debian is located at `/etc/hosts`
     docker compose -f nextcloud.yaml up -d --build app
     ```
 * If the post-installation scripts could not run correctly due to some reason, they can be run again using the following scripts
+
 ```batch
 docker exec -u www-data -i app sh < .\nextcloud\appHooks\post-installation\00_indicate_rev_proxy_https.sh
 docker exec -u www-data -i app sh < .\nextcloud\appHooks\post-installation\01_install_apps.sh
 ```
+
 To run script from Linux based workstations, use the following commands instead
 ```bash
 docker exec -u www-data -i app sh < ./nextcloud/appHooks/post-installation/00_indicate_rev_proxy_https.sh

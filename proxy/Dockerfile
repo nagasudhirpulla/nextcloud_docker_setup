@@ -1,4 +1,4 @@
-FROM httpd
+FROM httpd:alpine
 COPY --chmod=664 nextcloud.conf /usr/local/apache2/conf/nextcloud.conf
 COPY --chmod=664 collabora.conf /usr/local/apache2/conf/collabora.conf
 COPY --chmod=664 signal.conf /usr/local/apache2/conf/signal.conf

@@ -79,17 +79,6 @@ services:
       # keep this false when moving to CA-issued valid SSL certificates
       SKIP_CERT_VERIFY: ${SKIP_CERT_VERIFY}
 
-  # cron:
-  #   image: nextcloud:apache
-  #   restart: always
-  #   volumes:
-  #     - nextcloud:/var/www/html:z
-  #     # NOTE: The `volumes` config of the `cron` and `app` containers must match
-  #   entrypoint: /cron.sh
-  #   depends_on:
-  #     - db
-  #     - redis
-
   # Collabora online server for nextcloud to enable document processing. Reference: https://hub.docker.com/r/collabora/code
   # https://cloud.thesysadminhub.com/s/FNKyP43y35HGDTJ?dir=/
   # https://docs.nextcloud.com/server/28/admin_manual/office/example-docker.html#install-the-collabora-online-server

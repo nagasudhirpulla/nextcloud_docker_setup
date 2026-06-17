@@ -1,6 +1,9 @@
 # # set default app to dashboard
 # php occ config:system:set defaultapp --value=dashboard
 
+# rely on system cron to update nextcloud periodically
+php occ background:cron
+
 # install nextcloud office app
 php occ app:install richdocuments
 

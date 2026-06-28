@@ -76,12 +76,12 @@ docker exec -u www-data -i app sh < ./nextcloud/appHooks/post-installation/01_in
 ### Setup pgbackrest
 * If required manually start the backup container using
 ```sh
-docker compose -f nextcloud.yaml up -d --build pg_backup_runner
+docker compose -f nextcloud.yaml up -d --build pgbackrest
 ```
 
 * Initialize the pgbackrest stanza in the backup folder
 ```sh
-docker exec -it pg_backup_runner pgbackrest --stanza=main stanza-create
+docker exec -it pg_backup_runner pgbackrest --stanza=main --no-online stanza-create
 ```
 
 * check if pgbackrest is able to authenticate with db

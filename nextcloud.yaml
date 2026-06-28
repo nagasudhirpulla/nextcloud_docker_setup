@@ -5,32 +5,10 @@ services:
     image: postgres:alpine
     container_name: db
     restart: always
-    command: >
-      postgres
-      -c wal_level=replica
-      -c max_wal_senders=10
     volumes:
       - db:/var/lib/postgresql:Z
     env_file:
       - db.env
-  
-  pgbackrest:
-    image: pgbackrest/pgbackrest:latest
-    container_name: pg_backup_runner
-    env_file:
-      - db.env
-    volumes:
-      - db:/var/lib/postgresql:ro
-      - ./backups/pg_backups:/var/lib/pgbackrest
-    # Dynamically generates the .pgpass file inside the container on startup
-    entrypoint: 
-      - /bin/bash
-      - -c
-      - |
-        echo "$${PGBACKREST_PG1_HOST}:5432:$${PGBACKREST_PG1_DATABASE}:$${PGBACKREST_PG1_USER}:$${POSTGRES_PASSWORD}" > /root/.pgpass
-        chmod 600 /root/.pgpass
-        echo "✅ Dynamic .pgpass generated successfully."
-        sleep infinity
 
   # Redis for nextcloud. Reference - https://hub.docker.com/_/redis
   redis:

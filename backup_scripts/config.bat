@@ -1,0 +1,8 @@
+set "DB_CONTAINER=db"
+set "NEXTCLOUD_CONTAINER=app"
+set "NEXTCLOUD_VOLUME=nextcloud_nextcloud"
+set "DB_VOLUME=nextcloud_db"
+set "DB_USER=nextcloud"
+set "DB_NAME=nextcloud"
+set "RESTIC_PASSWORD=password123"
+set "BACKUPS_DIR=%cd%\..\backups"

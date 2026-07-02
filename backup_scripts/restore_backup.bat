@@ -7,6 +7,16 @@ echo   NEXTCLOUD & POSTGRESQL COMPLETE RECOVERY SCRIPT
 echo ===================================================
 echo.
 
+:: 1. Check if a Backup ID was provided; otherwise, fallback to latest
+if "%~1" == "" (
+    set "BACKUP_ID=latest"
+    echo [INFO] No Backup ID provided. Falling back to the LATEST snapshot...
+) else (
+    set "BACKUP_ID=%~1"
+    echo [INFO] Target Backup ID selected: %BACKUP_ID%
+)
+echo.
+
 echo [1/7] Stopping active Nextcloud container...
 docker stop %NEXTCLOUD_CONTAINER%
 
@@ -16,7 +26,7 @@ echo [2/7] Wiping existing Docker volumes clean to prevent data corruption...
 docker run --rm --mount source=%NEXTCLOUD_VOLUME%,target=/data busybox sh -c "rm -rf /data/*"
 
 echo.
-echo [3/7] Restoring Files and Database from the latest Restic snapshot...
+echo [3/7] Restoring Files and Database from the Restic snapshot id %BACKUP_ID%...
 :: Maps both clean target volumes and unpacks the respective data back into them
 docker run --rm ^
   --mount source=%NEXTCLOUD_VOLUME%,target=/data/nextcloud_files ^
@@ -24,7 +34,7 @@ docker run --rm ^
   -v "%cd%:/repo" ^
   -e RESTIC_PASSWORD=%RESTIC_PASSWORD% ^
   restic/restic ^
-  -r /repo restore latest --target /
+  -r /repo restore %BACKUP_ID% --target /
 
 echo.
 echo [4/7] Importing the PostgreSQL Database Dump...

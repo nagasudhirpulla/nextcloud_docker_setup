@@ -68,186 +68,19 @@ docker exec -u www-data -i app sh < ./nextcloud/appHooks/post-installation/00_in
 docker exec -u www-data -i app sh < ./nextcloud/appHooks/post-installation/01_install_apps.sh
 ```
 
-## run cron nextcloud cron job
+## Run cron nextcloud cron job
 * run `docker exec -u www-data app php /var/www/html/cron.php` every 5 mins so that cron.php is run the machine running the nextcloud docker container
 * Run `sudo crontab -e -u www-data` and add the line `*/5 * * * * docker exec -u www-data app php /var/www/html/cron.php`
 
-## Run database backup
-### Setup pgbackrest
-* If required manually start the backup container using
-```sh
-docker compose -f nextcloud.yaml up -d --build pgbackrest
-```
-
-* Initialize the pgbackrest stanza in the backup folder
-```sh
-docker exec -it pg_backup_runner pgbackrest --stanza=main --no-online stanza-create
-```
-
-* check if pgbackrest is able to authenticate with db
-```sh
-docker exec -it pg_backup_runner pgbackrest --stanza=main check
-``` 
-### Backup db
-* The following shell script performs a daily incremental and weekly full backup of the db. This script can be run as a daily cron job (Example daily 1 AM cron `0 1 * * * /path/to/run_backup.sh`)
-
-```sh
-#!/bin/bash
-set -e
-
-CONTAINER_NAME="pg_backup_runner"
-STANZA_NAME="main"
-
-# Create log directory and timestamped file name
-LOG_DIR="/var/log/pgbackrest"
-mkdir -p "$LOG_DIR"
-LOG_FILE="${LOG_DIR}/backup_$(date +%Y-%m-%d_%H-%M-%S).log"
-
-DAY_OF_WEEK=$(date +%u)
-
-echo "=== Backup Started at $(date) ===" > "$LOG_FILE"
-
-# Determine backup type
-if [ "$DAY_OF_WEEK" -eq 7 ]; then
-    BACKUP_TYPE="full"
-    echo "📅 Sunday detected. Triggering WEEKLY FULL backup..." >> "$LOG_FILE"
-else
-    BACKUP_TYPE="incr"
-    echo "📅 Weekday detected. Triggering DAILY INCREMENTAL backup..." >> "$LOG_FILE"
-fi
-
-# Execute backup
-if docker exec "$CONTAINER_NAME" pgbackrest --stanza="$STANZA_NAME" --type="$BACKUP_TYPE" backup >> "$LOG_FILE" 2>&1; then
-    echo "✅ Backup ($BACKUP_TYPE) completed successfully at $(date)." >> "$LOG_FILE"
-else
-    echo "❌ ERROR: Backup ($BACKUP_TYPE) failed!" >> "$LOG_FILE"
-    exit 1
-fi
-
-# Clean up local logs older than 30 days
-find "$LOG_DIR" -name "backup_*.log" -type f -mtime +30 -delete
-``` 
+## Database backup
+Database logical backup and restore is done in run_backup.sh using `pg_dump` and `pg_restore` postgres commands
 
 ### List all backups
-```sh
-docker exec pg_backup_runner pgbackrest --stanza=main info
-```
+`list_backups.sh` will display restic backup IDs that are present in the backup storage
 
-The output will look similar to:
-```
-stanza: main
-    status: mixed
-    
-    db (current)
-        wal archive min/max (16): 000000010000000000000001 / 00000001000000000000000F
-
-        full backup: 20260621-010000F
-            timestamp start/stop: 2026-06-21 01:00:00 / 2026-06-21 01:05:22
-            wal info: min/max (16): 000000010000000000000002 / 000000010000000000000004
-            size: 4.2GB, repo size: 1.1GB
-
-        incr backup: 20260621-010000F_20260622-010000I
-            timestamp start/stop: 2026-06-22 01:00:00 / 2026-06-22 01:01:10
-            wal info: min/max (16): 000000010000000000000005 / 000000010000000000000005
-            size: 154MB, repo size: 12MB
-```
-
-The text strings like 20260621-010000F or 20260621-010000F_20260622-010000I are our Unique Backup IDs.
-
-### Restore specific bcakup using its ID
-* Append the `--set=` parameter followed by a chosen Backup ID to restore the database to a specific snapshot in time
-
-```sh
-docker exec -it pg_backup_runner pgbackrest \
-  --stanza=main \
-  --set=20260621-010000F_20260622-010000I \
-  delta \
-  restore
-```
-
-### Restore db
-
-```sh
-#!/bin/bash
-set -e
-
-# Accept the first script argument as the target backup ID
-TARGET_BACKUP=$1
-
-echo "=========================================================="
-echo "🚨 NEXTCLOUD DISASTER RECOVERY UTILITY 🚨"
-echo "=========================================================="
-
-# 1. Display available options
-echo "📚 Fetching available backups from NAS storage..."
-echo "----------------------------------------------------------"
-docker exec pg_backup_runner pgbackrest --stanza=main info
-echo "----------------------------------------------------------"
-
-if [ -z "$TARGET_BACKUP" ]; then
-    echo "💡 No target ID specified. Restoring the LATEST available backup."
-    RESTORE_FLAGS="--log-level-console=info delta restore"
-else
-    echo "🎯 Specific Target Requested: $TARGET_BACKUP"
-    RESTORE_FLAGS="--set=$TARGET_BACKUP --log-level-console=info delta restore"
-fi
-
-read -p "⚠️ Proceed with data overwrite? (y/N): " CONFIRM
-if [[ ! "$CONFIRM" =~ ^[Yy]$ ]]; then
-    echo "❌ Restore cancelled."
-    exit 0
-fi
-
-echo "⏱️ 1. Stopping 'db' container..."
-docker compose stop db
-
-echo "🧹 2. Wiping target data directory..."
-docker compose run --rm --entrypoint bash pgbackrest -c "rm -rf /var/lib/postgresql/18/docker/*"
-
-echo "📥 3. Restoring requested backup blocks from NAS..."
-docker exec -it pg_backup_runner pgbackrest --stanza=main $RESTORE_FLAGS
-
-echo "⚡ 4. Restarting 'db' container..."
-docker compose start db
-
-# Automated Health Check Layer
-echo "🔍 5. Initiating database cluster health verification..."
-MAX_ATTEMPTS=10
-ATTEMPT=1
-DB_READY=0
-
-while [ $ATTEMPT -le $MAX_ATTEMPTS ]; do
-    echo "   ⏳ Checking if database port is accepting connections... (Attempt $ATTEMPT/$MAX_ATTEMPTS)"
-    if docker exec db pg_isready -U nextcloud -d nextcloud > /dev/null 2>&1; then
-        DB_READY=1
-        break
-    fi
-    sleep 3
-    ATTEMPT=$((ATTEMPT + 1))
-done
-
-if [ $DB_READY -eq 0 ]; then
-    echo "❌ ERROR: Database engine failed to start up in time!"
-    exit 1
-fi
-
-echo "   📋 Executing table readability check..."
-if docker exec db psql -U nextcloud -d nextcloud -c "SELECT 'Core DB Access OK' AS status;" > /dev/null 2>&1; then
-    echo "=========================================================="
-    echo "✅ SUCCESS: Nextcloud database restored and fully healthy! ✅"
-    echo "=========================================================="
-else
-    echo "⚠️ WARNING: Database port is open, but connection validation failed!"
-    exit 1
-fi
-```
-
-## Tips
-* Add trusted domains in Nextcloud with occ command
-```bash
-php occ config:system:set trusted_domains 2 --value=nextcloud.local
-php occ config:system:set trusted_domains 3 --value=192.168.0.3
-```
+### Restore latest or specific bcakup using its ID
+* when `restore_backup.bat` is run, latest snapshot is restored
+* when `restore_backup.bat a1b2c3d4` is run, snapshot id `a1b2c3d4` is restored
 
 ## .env file
 ```bash
@@ -270,23 +103,6 @@ SKIP_CERT_VERIFY=true
 POSTGRES_DB=nextcloud
 POSTGRES_USER=nextcloud
 POSTGRES_PASSWORD=learningsoftware
-
-# pgBackRest Global & Retention Settings
-PGBACKREST_STANZA=main
-PGBACKREST_REPO1_PATH=/var/lib/pgbackrest
-PGBACKREST_REPO1_RETENTION_FULL=2
-PGBACKREST_COMPRESS_TYPE=lz4
-PGBACKREST_LOG_LEVEL_CONSOLE=info
-
-# Pure Pull-Based Network Configurations
-PGBACKREST_PG1_TYPE=pg
-PGBACKREST_PG1_HOST=db
-PGBACKREST_PG1_PATH=/var/lib/postgresql/18/docker
-PGBACKREST_PG1_USER=${POSTGRES_USER}
-PGBACKREST_PG1_DATABASE=${POSTGRES_DB}
-
-# Retain exactly 13 full backups (13 weeks * 7 days = 91 days of history)
-PGBACKREST_REPO1_RETENTION_FULL=13
 ```
 
 ## References

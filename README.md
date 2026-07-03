@@ -72,7 +72,24 @@ docker exec -u www-data -i app sh < ./nextcloud/appHooks/post-installation/01_in
 * run `docker exec -u www-data app php /var/www/html/cron.php` every 5 mins so that cron.php is run the machine running the nextcloud docker container
 * Run `sudo crontab -e -u www-data` and add the line `*/5 * * * * docker exec -u www-data app php /var/www/html/cron.php`
 
-## Database backup
+## Backup
+* Nextcloud files and database logical backup file are backed up using `restic` backup
+* `run_backup.bat` script runs backup and stores it in the restic backup vault
+* All the backup and restore scripts will require a `config.bat` file in the `backup_scripts` directory that contains the following configuration variables
+
+```bat
+REM config.bat
+set "DB_CONTAINER=db"
+set "NEXTCLOUD_CONTAINER=app"
+set "NEXTCLOUD_VOLUME=nextcloud_nextcloud"
+set "DB_VOLUME=nextcloud_db"
+set "DB_USER=nextcloud"
+set "DB_NAME=nextcloud"
+set "RESTIC_PASSWORD=password123"
+set "BACKUPS_DIR=%cd%\..\backups"
+```
+
+### Database backup
 Database logical backup and restore is done in run_backup.sh using `pg_dump` and `pg_restore` postgres commands
 
 ### List all backups

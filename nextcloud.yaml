@@ -104,7 +104,6 @@ services:
     ports:
       - 127.0.0.1:9980:9980
     networks:
-      - default
       - proxy-tier
 
   # nextcloud talk server for nextcloud to enable audio/video calls. Reference: https://hub.docker.com/r/nextcloud/aio-talk
@@ -127,7 +126,6 @@ services:
       - SKIP_CERT_VERIFY=${SKIP_CERT_VERIFY} # true for local self-signed certs; false for CA-issued valid SSL certificates
     restart: unless-stopped
     networks:
-      - default
       - proxy-tier
     # extra_hosts:
     #   - "${NEXTCLOUD_FQDN}:${REVPROXY_IPADDRESS}"

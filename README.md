@@ -68,17 +68,36 @@ docker exec -u www-data -i app sh < ./nextcloud/appHooks/post-installation/00_in
 docker exec -u www-data -i app sh < ./nextcloud/appHooks/post-installation/01_install_apps.sh
 ```
 
-
-## run cron nextcloud cron job
+## Run cron nextcloud cron job
 * run `docker exec -u www-data app php /var/www/html/cron.php` every 5 mins so that cron.php is run the machine running the nextcloud docker container
 * Run `sudo crontab -e -u www-data` and add the line `*/5 * * * * docker exec -u www-data app php /var/www/html/cron.php`
 
-## Tips
-* Add trusted domains in Nextcloud with occ command
-```bash
-php occ config:system:set trusted_domains 2 --value=nextcloud.local
-php occ config:system:set trusted_domains 3 --value=192.168.0.3
+## Backup
+* Nextcloud files and database logical backup file are backed up using `restic` backup
+* `run_backup.bat` script runs backup and stores it in the restic backup vault
+* All the backup and restore scripts will require a `config.bat` file in the `backup_scripts` directory that contains the following configuration variables
+
+```bat
+REM config.bat
+set "DB_CONTAINER=db"
+set "NEXTCLOUD_CONTAINER=app"
+set "NEXTCLOUD_VOLUME=nextcloud_nextcloud"
+set "DB_VOLUME=nextcloud_db"
+set "DB_USER=nextcloud"
+set "DB_NAME=nextcloud"
+set "RESTIC_PASSWORD=password123"
+set "BACKUPS_DIR=%cd%\..\backups"
 ```
+
+### Database backup
+Database logical backup and restore is done in run_backup.sh using `pg_dump` and `pg_restore` postgres commands
+
+### List all backups
+`list_backups.sh` will display restic backup IDs that are present in the backup storage
+
+### Restore latest or specific bcakup using its ID
+* when `restore_backup.bat` is run, latest snapshot is restored
+* when `restore_backup.bat a1b2c3d4` is run, snapshot id `a1b2c3d4` is restored
 
 ## .env file
 ```bash

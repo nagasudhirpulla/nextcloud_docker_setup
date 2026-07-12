@@ -31,7 +31,7 @@ echo [3/7] Restoring Files and Database from the Restic snapshot id %BACKUP_ID%.
 docker run --rm ^
   --mount source=%NEXTCLOUD_VOLUME%,target=/data/nextcloud_files ^
   --mount source=%DB_VOLUME%,target=/data/postgres_raw_data ^
-  -v "%cd%:/repo" ^
+  -v "%BACKUPS_DIR%:/repo" ^
   -e RESTIC_PASSWORD=%RESTIC_PASSWORD% ^
   restic/restic ^
   -r /repo restore %BACKUP_ID% --target /
@@ -58,4 +58,3 @@ echo.
 echo ===================================================
 echo   Recovery process complete! System is back online.
 echo ===================================================
-pause

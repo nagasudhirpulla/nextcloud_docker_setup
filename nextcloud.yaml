@@ -22,8 +22,8 @@ services:
     container_name: app
     hostname: app
     restart: always
-    ports:
-      - 8080:80
+    # ports:
+    #   - 8080:80
     volumes:
       # NOTE: The `volumes` config of the `cron` and `app` containers must match
       - nextcloud:/var/www/html:z

@@ -1,6 +1,8 @@
 db.env
 certs/
 backups/
+backup_scripts/config.sh
+backup_scripts/config.bat
 
 # Logs
 logs

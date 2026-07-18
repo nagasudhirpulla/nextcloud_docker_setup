@@ -1,9 +1,11 @@
 ## Overview
-This repository is a docker compose based setup for nextcloud along with 
-* Collabora (for web based document editing support) 
-* Redis caching
-* Nextcloud talk 
-* Apache reverse proxy
+* This repository is a docker compose based setup for nextcloud along with 
+  * Collabora (for web based document editing support) 
+  * Redis caching
+  * Nextcloud talk 
+  * Apache reverse proxy
+* This repository also has the scripts for docker based scripts to incrementally backup and restore the nextcloud data periodically
+* This repository also has the docker compose based setup to generate self-signed certificates if required for the nextcloud, collabora and signal domains 
 
 ![architecture.svg](./img/architecture.svg)
 

@@ -2,8 +2,10 @@
 :: Navigate to the script's directory
 cd /d "%~dp0"
 
+CALL config.bat
+
 echo ===================================================
-echo   NEXTCLOUD & POSTGRESQL COMPLETE RECOVERY SCRIPT
+echo   NEXTCLOUD and POSTGRESQL COMPLETE RECOVERY SCRIPT
 echo ===================================================
 echo.
 
@@ -38,7 +40,14 @@ docker run --rm ^
 
 echo.
 echo [4/7] Importing the PostgreSQL Database Dump...
-:: Drops existing tables to avoid conflicts during import
+:: Terminate all active connections to the target database 
+docker exec -i %db_container% psql -U %DB_USER% -d template1 -c "SELECT pg_terminate_backend(pid) FROM pg_stat_activity WHERE datname = '%DB_NAME%' AND pid ^<^> pg_backend_pid();"
+
+:: Drop and recreate the database inside the container
+docker exec -i %DB_CONTAINER% psql -U %DB_USER% -d template1 -c "DROP DATABASE IF EXISTS \"%DB_NAME%\";"
+docker exec -i %DB_CONTAINER% psql -U %DB_USER% -d template1 -c "CREATE DATABASE \"%DB_NAME%\";"
+
+:: restore the database dump into the newly created database
 docker exec %DB_CONTAINER% pg_restore -U %DB_USER% -d %DB_NAME% -v /var/lib/postgresql/nextcloud_backup.dump
 
 echo.

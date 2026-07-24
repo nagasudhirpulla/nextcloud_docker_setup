@@ -44,7 +44,7 @@ echo "[5/7] disabling nextcloud maintenance mode..."
 docker exec -u www-data "$nextcloud_container" php occ maintenance:mode --off
 echo ""
 
-echo "[6/7] pruning old data (keeping last 365 days)..."
+echo "[6/7] pruning old data (keeping last $restic_retention days)..."
 docker run --rm \
   -v "$backups_dir:/repo" \
   -e RESTIC_PASSWORD="$restic_password" \

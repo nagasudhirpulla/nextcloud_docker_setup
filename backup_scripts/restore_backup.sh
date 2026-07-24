@@ -59,7 +59,7 @@ docker exec -i "$db_container" psql -U "$db_user" -d template1 -c "DROP DATABASE
 docker exec -i "$db_container" psql -U "$db_user" -d template1 -c "CREATE DATABASE \"$db_name\";"
 
 # 3. Restore the database dump into the newly created database
-docker exec "$db_container" pg_restore -U "$db_user" -d "$db_name" -v /var/lib/postgresql/nextcloud_backup.dump
+docker exec "$db_container" pg_restore -U "$db_user" -d "$db_name" /var/lib/postgresql/nextcloud_backup.dump
 echo ""
 
 echo "[5/7] Restarting Application container..."

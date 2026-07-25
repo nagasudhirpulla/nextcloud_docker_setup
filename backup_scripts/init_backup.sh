@@ -18,4 +18,3 @@ docker run --rm \
   -e RESTIC_PASSWORD="$restic_password" \
   restic/restic \
   init -r /repo
-  

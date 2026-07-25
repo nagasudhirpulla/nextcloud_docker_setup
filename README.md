@@ -24,8 +24,8 @@ docker compose -f self_signed_certs_gen.yaml up -d --build omgwtfssl3
 ```
 
 ## Docker instructions
-* command to run docker compose - `docker compose -f .\nextcloud.yaml up -d --build`. This spins up all the nextcloud application's docker containers 
-* command to run a container named app inside docker compose - `docker compose -f .\nextcloud.yaml up -d --build app`
+* command to run docker compose - `docker compose -f nextcloud.yaml up -d --build`. This spins up all the nextcloud application's docker containers 
+* command to run a container named app inside docker compose - `docker compose -f nextcloud.yaml up -d --build app`
 * config file location in nextcloud docker container - `/var/www/html/config/config.php`
 * access docker container as `www-data` user to run php occ commands - `docker exec -it -u www-data app bash`
 

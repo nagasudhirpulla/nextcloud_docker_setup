@@ -98,7 +98,7 @@ Database logical backup and restore is done in run_backup.sh using `pg_dump` and
 * when `restore_backup.bat a1b2c3d4` is run, snapshot id `a1b2c3d4` is restored
 
 ## External Storage Support
-### Docker host's local folder location
+### Docker host's local / NAS folder
 * A local folder location of the docker host can be used as an external storage location in docker
 * In the .env file, mention docker host folder details as shown below using the variables `ENABLE_EXTERNAL_STORAGE` and `EXTERNAL_STORAGE_PATH`
 
@@ -118,6 +118,8 @@ sudo chmod -R 750 /folder/path
 ```
 
 * External NAS can also be mounted as a local folder and then used as a nextcloud external storage. Backup and restore of NAS or any external storage should be handled separately 
+
+![Nextcloud NAS setup](./img/nextcloud_nas_setup.png)
 
 ## References
 * Nextlcoud `occ` command docs - https://docs.nextcloud.com/server/stable/admin_manual/configuration_server/occ_command.html#using-the-occ-command

@@ -40,5 +40,5 @@ php occ talk:turn:add "turn" "${SIGNAL_FQDN}:3478" "udp,tcp" --secret="${TURN_SE
 # enable external storage support if requested
 if [ "${ENABLE_EXTERNAL_STORAGE}" = "true" ]; then
   php occ app:enable files_external
-  php occ files_external:create "Folder_Storage" local null::null -c datadir="/local_folder"
+  php occ files_external:create "${EXTERNAL_STORAGE_FOLDER_NAME}" local null::null -c datadir="/local_folder"
 fi

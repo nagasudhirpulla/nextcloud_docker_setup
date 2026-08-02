@@ -36,3 +36,9 @@ php occ talk:stun:delete "stun.nextcloud.com:443"
 
 # configure turn server for nextcloud talk
 php occ talk:turn:add "turn" "${SIGNAL_FQDN}:3478" "udp,tcp" --secret="${TURN_SECRET}"
+
+# enable external storage support if requested
+if [ "${ENABLE_EXTERNAL_STORAGE}" = "true" ]; then
+  php occ app:enable files_external
+  php occ files_external:create "Folder_Storage" local null::null -c datadir="/local_folder"
+fi

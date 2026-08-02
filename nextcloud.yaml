@@ -28,7 +28,7 @@ services:
       # NOTE: The `volumes` config of the `cron` and `app` containers must match
       - nextcloud:/var/www/html:z
       - ./nextcloud/appHooks/post-installation:/docker-entrypoint-hooks.d/post-installation
-    # - /nas:/nas
+      - ${EXTERNAL_STORAGE_PATH:-./img}:/local_folder
     # - ./nextcloud/appHooks/before-starting:/docker-entrypoint-hooks.d/before-starting
     environment:
       POSTGRES_HOST: db
@@ -42,6 +42,7 @@ services:
       SIGNALING_SECRET: ${SIGNALING_SECRET}
       SKIP_CERT_VERIFY: ${SKIP_CERT_VERIFY} # true for local self-signed certs; false for CA-issued valid SSL certificates
       TURN_SECRET: ${TURN_SECRET}
+      ENABLE_EXTERNAL_STORAGE: ${ENABLE_EXTERNAL_STORAGE}
     # extra_hosts:
     #   - "${COLLABORA_FQDN}:${REVPROXY_IPADDRESS}"
     #   - "${NEXTCLOUD_FQDN}:${REVPROXY_IPADDRESS}"

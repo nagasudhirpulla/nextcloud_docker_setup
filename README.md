@@ -43,7 +43,7 @@ docker compose -f self_signed_certs_gen.yaml up -d --build omgwtfssl3
 hosts file in windows is located at `C:\Windows\System32\drivers\etc\hosts`
 hosts file in debian is located at `/etc/hosts`
 
-* Run the whole docker compose with `docker compose -f 'nextcloud.yaml' up -d --build`
+* Run the whole docker compose with `docker compose -f nextcloud.yaml up -d --build`
 
     * Run `collabora` container (for nextcloud office online editor)
     ```bash
@@ -96,6 +96,28 @@ Database logical backup and restore is done in run_backup.sh using `pg_dump` and
 ### Restore latest or specific bcakup using its ID
 * when `restore_backup.bat` is run, latest snapshot is restored
 * when `restore_backup.bat a1b2c3d4` is run, snapshot id `a1b2c3d4` is restored
+
+## External Storage Support
+### Docker host's local folder location
+* A local folder location of the docker host can be used as an external storage location in docker
+* In the .env file, mention docker host folder details as shown below using the variables `ENABLE_EXTERNAL_STORAGE` and `EXTERNAL_STORAGE_PATH`
+
+```sh
+ENABLE_EXTERNAL_STORAGE=true
+EXTERNAL_STORAGE_PATH=/folder/path
+```
+
+* If the docker host is linux, make sure the UID and GID 33 have write permissions to the folder. Because the nextcloud container's www-data user always runs with UID 33 and GID 33
+
+```sh
+# Set ownership to UID 33 and GID 33
+sudo chown -R 33:33 /folder/path
+
+# Set proper read/write permissions
+sudo chmod -R 750 /folder/path
+```
+
+* External NAS can also be mounted as a local folder and then used as a nextcloud external storage. Backup and restore of NAS or any external storage should be handled separately 
 
 ## References
 * Nextlcoud `occ` command docs - https://docs.nextcloud.com/server/stable/admin_manual/configuration_server/occ_command.html#using-the-occ-command

@@ -40,5 +40,10 @@ php occ talk:turn:add "turn" "${SIGNAL_FQDN}:3478" "udp,tcp" --secret="${TURN_SE
 # enable external storage support if requested
 if [ "${ENABLE_EXTERNAL_STORAGE}" = "true" ]; then
   php occ app:enable files_external
-  php occ files_external:create "${EXTERNAL_STORAGE_FOLDER_NAME}" local null::null -c datadir="/local_folder"
+
+  if ! php occ files_external:list 2>/dev/null | grep -Fq -- "${EXTERNAL_STORAGE_FOLDER_NAME}"; then
+    php occ files_external:create "${EXTERNAL_STORAGE_FOLDER_NAME}" local null::null -c datadir="/local_folder"
+  else
+    echo "Local storage named '${EXTERNAL_STORAGE_FOLDER_NAME}' already exists, skipping creation."
+  fi
 fi

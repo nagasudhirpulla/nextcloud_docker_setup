@@ -121,6 +121,9 @@ sudo chmod -R 750 /folder/path
 
 ![Nextcloud NAS setup](./img/nextcloud_nas_setup.png)
 
+## Videos
+https://youtube.com/playlist?list=PLZJ6Et6SUNyE&si=lico35g9POjSjy-3
+
 ## References
 * Nextlcoud `occ` command docs - https://docs.nextcloud.com/server/stable/admin_manual/configuration_server/occ_command.html#using-the-occ-command
 * Nextcloud docker setup blog - https://help.nextcloud.com/t/howto-ubuntu-docker-nextcloud-talk-collabora/76430
